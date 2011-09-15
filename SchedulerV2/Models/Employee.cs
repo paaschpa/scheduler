@@ -23,7 +23,7 @@ namespace SchedulerV2.Models
         public bool IsGM { get; set; }
         public bool IsDO { get; set; }
         public String Email { get; set; }
-        public String DisplyName { get; set; }
+        public String DisplayName { get; set; }
         public bool IsDeleted { get; set; }
         public int HomeLocationId { get; set; }
 

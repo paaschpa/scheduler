@@ -14,7 +14,7 @@
                 mappings.For<SchedulerV2.Models.Employee>(binding => binding
                     .ItemDataBound((item, employee) =>
                     {                                                
-                        item.Text = employee.FirstName;               
+                        item.Text = employee.DisplayName;               
                     })
                     .Children(employee => employee.Locations));
 
@@ -34,7 +34,7 @@
 
 <p>
     Select a Schedule or create a schedule for location 
-    <span id="selected_location"></span> <%=Html.ActionLink("new schedule", "create", "schedule", new {id = "create_schedule"}) %>
+    <span id="selected_location"></span> 
 </p>
 
 <%= Html.Telerik().Grid(new List<SchedulerV2.Models.Schedule>())
@@ -43,8 +43,12 @@
                 .Columns(columns =>
                     {
                         columns.Bound(x => x.ScheduleID).Width(50);
-                        columns.Bound(x => x.StartDate).Width(125);
-                        columns.Bound(x => x.EndDate);
+                        columns.Bound(x => x.StartDate).Width(125).Format("{0:MM/dd/yyyy}");
+                        columns.Bound(x => x.EndDate).Format("{0:MM/dd/yyyy}");
+                        columns.Bound(x => x.ScheduleID)
+                            .Format("<a href='/Calendar/Index?scheduleId={0}'>Edit Calendar</a>")
+                            .Encoded(false)
+                            .Title("Edit");
                     }
                 )
                 .DataBinding(dataBinding => dataBinding
@@ -56,13 +60,17 @@
             //.DataBinding(dataBinding => dataBinding.Ajax().Select("GetSchedules", "Home"))
             ////.DataBinding(d => d.Ajax().Select("Home","GetSchedules"));
 %>
-
-<script>
+<%=Html.ActionLink("create new", "Create", "Schedule", new {id = "create_schedule"}) %>
+<script type="text/javascript">
     function treeView_OnSelect(e) {
         if (e.item.childElementCount == 1) {
             //alert(this.getItemValue(e.item));
+            var locationId = this.getItemValue(e.item);
             $("#selected_location").html(this.getItemText(e.item));
-            $("#create_schedule").attr("href", "/Schedule/Create?locationID=" + this.getItemValue(e.item));         
+            $("#create_schedule").attr("href", "/Schedule/Create?locationID=" + locationId);
+            var grid = $("#Grid").data("tGrid");
+            grid.ajax.selectUrl = "/Home/GetSchedules?locationId=" + locationId;
+            grid.ajaxRequest();
         }              
     }
 </script>

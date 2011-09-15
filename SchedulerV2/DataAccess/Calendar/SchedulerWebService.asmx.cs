@@ -1,11 +1,10 @@
-﻿namespace MvcApplication1.DataAccess.Calendar
+﻿namespace SchedulerV2.DataAccess.Calendar
 {
 	using System.Collections.Generic;
 	using System.Web.Script.Services;
 	using System.Web.Services;
 	using System.Web.SessionState;
 	using Telerik.Web.UI;
-    using SchedulerV2.DataAccess.Calendar;
 
 	/// <summary>
 	/// RadScheduler data service.

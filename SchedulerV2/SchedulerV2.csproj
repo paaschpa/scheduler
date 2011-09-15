@@ -199,8 +199,10 @@
       <DependentUpon>UploadLocalization.ru-RU.resx</DependentUpon>
     </Compile>
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\CalendarController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LocationController.cs" />
+    <Compile Include="Controllers\ScheduleController.cs" />
     <Compile Include="DataAccess\Calendar\SchedulerWebService.asmx.cs">
       <DependentUpon>SchedulerWebService.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -443,6 +445,8 @@
     <Content Include="Scripts\2011.2.712\telerik.upload.min.js" />
     <Content Include="Scripts\2011.2.712\telerik.window.min.js" />
     <Content Include="Views\Account\LogOn.aspx" />
+    <Content Include="Views\Calendar\Index.aspx" />
+    <Content Include="Views\Schedule\Create.aspx" />
     <Content Include="Views\Shared\EditorTemplates\Currency.ascx" />
     <Content Include="Views\Shared\EditorTemplates\Date.ascx" />
     <Content Include="Views\Shared\EditorTemplates\DateTime.ascx" />
