@@ -5,7 +5,7 @@ using System.Web;
 using System.Data.SqlClient;
 using System.Data.Common;
 using System.Configuration;
-using SchedulerV2.DataAccess.Dapper;
+using SchedulerV2.DataAccess.DapperLibrary;
 
 namespace SchedulerV2.Models
 {
@@ -55,6 +55,19 @@ namespace SchedulerV2.Models
                     , null, null, true, "SplitOn", null, null);
 
                 return employees.ToList();
+            }
+        }
+
+        public static Employee FindByUserName(String userName)
+        {
+            using (DbConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CalendarConnectionString"].ToString()))
+            {
+                conn.Open();
+                var sql = @"Select * From Employees Where UserName = @userName";
+
+                var employee = conn.Query<Employee>(sql, new { userName = userName });
+
+                return employee.SingleOrDefault();
             }
         }
     }

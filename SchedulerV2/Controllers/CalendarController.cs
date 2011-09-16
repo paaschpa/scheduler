@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using SchedulerV2.Models;
 
 namespace SchedulerV2.Controllers
 {
@@ -10,11 +11,10 @@ namespace SchedulerV2.Controllers
     {
         //
         // GET: /Calendar/
-
-        public ActionResult Index()
+        public ActionResult Index(int? scheduleId)
         {
-            return View();
+            var schedule = Schedule.FindById(scheduleId.Value);
+            return View(schedule);
         }
-
     }
 }

@@ -61,6 +61,7 @@
             ////.DataBinding(d => d.Ajax().Select("Home","GetSchedules"));
 %>
 <%=Html.ActionLink("create new", "Create", "Schedule", new {id = "create_schedule"}) %>
+
 <script type="text/javascript">
     function treeView_OnSelect(e) {
         if (e.item.childElementCount == 1) {

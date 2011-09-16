@@ -17,7 +17,7 @@ using System.Text;
 using System.Threading;
 using System.Text.RegularExpressions;
 
-namespace SchedulerV2.DataAccess.Dapper
+namespace SchedulerV2.DataAccess.DapperLibrary
 {
     public static partial class SqlMapper
     {

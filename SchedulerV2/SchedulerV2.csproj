@@ -66,10 +66,10 @@
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Web.Mvc, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Telerik.Web.Mvc">
-      <HintPath>..\..\..\..\..\..\..\Program Files\Telerik\Extensions for ASP.NET MVC Q2 2011\Binaries\Mvc2\Telerik.Web.Mvc.dll</HintPath>
+      <HintPath>..\lib\Telerik.Web.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="Telerik.Web.UI">
-      <HintPath>..\..\..\..\..\..\..\Program Files\Telerik\RadControls for ASP.NET AJAX Q1 2011\Bin40\Telerik.Web.UI.dll</HintPath>
+      <HintPath>..\lib\Telerik.Web.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
