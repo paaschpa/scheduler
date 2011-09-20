@@ -203,6 +203,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LocationController.cs" />
     <Compile Include="Controllers\ScheduleController.cs" />
+    <Compile Include="Controllers\ShiftController.cs" />
     <Compile Include="DataAccess\Calendar\SchedulerWebService.asmx.cs">
       <DependentUpon>SchedulerWebService.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -453,6 +454,7 @@
     <Content Include="Views\Shared\EditorTemplates\Integer.ascx" />
     <Content Include="Views\Shared\EditorTemplates\Number.ascx" />
     <Content Include="Views\Shared\EditorTemplates\Time.ascx" />
+    <Content Include="Views\Shift\Create.aspx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

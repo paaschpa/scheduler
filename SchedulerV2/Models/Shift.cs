@@ -29,5 +29,33 @@ namespace SchedulerV2.Models
                 return shifts;
             }
         }
+
+        public static Shift Create(Shift shift)
+        {
+            using (DbConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CalendarConnectionString"].ToString()))
+            {
+                conn.Open();
+                var sql = @"Insert Into Shifts(locationid, name, start, [end]) 
+                            Values (@locationId, @name, @start, @end)";
+                conn.Execute(sql,
+                    new
+                    {
+                        shift.LocationID,
+                        shift.Name,
+                        start = shift.Start.ToShortTimeString(),
+                        end = shift.End.ToShortTimeString()
+                    }
+                );
+                SetIdentity<int>(conn, id => shift.ShiftID = id);
+                return shift;
+            }
+        }
+
+        protected static void SetIdentity<T>(DbConnection connection, Action<T> setId)
+        {
+            dynamic identity = connection.Query("SELECT @@IDENTITY AS Id").Single();
+            T newId = (T)identity.Id;
+            setId(newId);
+        }
     }
 }
