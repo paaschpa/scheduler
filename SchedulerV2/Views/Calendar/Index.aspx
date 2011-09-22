@@ -45,12 +45,17 @@
         var end = new Date(scheduler_date + " " + grid_endTime);
 
         var newAppointment = new Telerik.Web.UI.SchedulerAppointment();
+        newAppointment.get_attributes().setAttribute('ScheduleID', <%= Model.ScheduleID %>)
         newAppointment.set_start(start);
         newAppointment.set_end(end);
         newAppointment.set_subject("Test");
 
         scheduler.insertAppointment(newAppointment);
         scheduler.editAppointment(newAppointment);
+    }
+
+    function saveOrUpdateAppointment(sender, eventArgs) {
+        alert('hi');
     }
 
     function cancelEvent(sender, eventArgs)
@@ -61,50 +66,26 @@
     function parseDateToYearMonthDate(full_date) {
         var mnth = full_date.getMonth() + 1; //months are 0 based
         return full_date.getFullYear() + "/" + mnth + "/" + full_date.getDate();
-    }
-                
-            
-//            args.set_cancel(true);
-//            Sys.Debug.traceDump({
-//                draggedItemsCount: args.get_draggedItems().length,
-//                targetItemId: args.get_targetItemId(),
-//                targetItemIndex: args.get_targetItemIndexHierarchical(),
-//                dropPosition: args.get_dropPosition(),
-//                targetHtmlElement: args.get_destinationHtmlElement().tagName
-//            });
+    }                         
     </script>
 
 <%=Html.ActionLink("create new", "Create", "Shift", new { locationId = Model.Location.LocationID }, null)%>
 <p>&nbsp;</p>
 
-<telerik:RadScheduler runat="server" ID="RadScheduler1" Height="400px" OnClientAppointmentWebServiceInserting="cancelEvent"
-    OnClientAppointmentsPopulating="cancelEvent" OnClientResourcesPopulating="cancelEvent" StartInsertingInAdvancedForm="true" >
+<telerik:RadScheduler runat="server" ID="RadScheduler1" Height="400px" 
+    OnClientAppointmentWebServiceInserting="cancelEvent"
+    StartInsertingInAdvancedForm="true"
+    CustomAttributeNames="ScheduleID">
 	<WebServiceSettings Path="~/DataAccess/Calendar/SchedulerWebService.asmx" />
-    <AdvancedEditTemplate>     
-        <asp:TextBox ID="TitleTextBox" Rows="5" Columns="20" runat="server" Text='<%# Bind("Subject") %>' Width="97%" TextMode="MultiLine">
-        </asp:TextBox><br />
-        
-        <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("Description") %>' Width="97%">
-        </asp:TextBox><br />
-
-        <telerik:RadDateInput ID="StartInput" SelectedDate='<%# Bind("Start") %>' runat="server">
-        </telerik:RadDateInput><br />
-
-        <telerik:RadDateInput ID="RadDateInput1" SelectedDate='<%# Bind("End") %>' runat="server">
-        </telerik:RadDateInput><br />
-    </AdvancedEditTemplate>
-    <AdvancedInsertTemplate>
-        <asp:TextBox ID="TitleTextBox" Rows="5" Columns="20" runat="server" Text='<%# Bind("Subject") %>' Width="97%" TextMode="MultiLine">
-        </asp:TextBox><br />
-        
-        <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("Description") %>' Width="97%">
-        </asp:TextBox><br />
-
-        <telerik:RadDateInput ID="StartInput" SelectedDate='<%# Bind("Start") %>' runat="server">
-        </telerik:RadDateInput><br />
-
-        <telerik:RadDateInput ID="RadDateInput1" SelectedDate='<%# Bind("End") %>' runat="server">
-        </telerik:RadDateInput><br />    </AdvancedInsertTemplate>
+    <ResourceTypes>
+    <telerik:ResourceType KeyField="ID" Name="User" TextField="UserName" ForeignKeyField="UserID"
+        DataSourceID="UsersDataSource" />
+    </ResourceTypes>
+    <ResourceStyles>
+        <telerik:ResourceStyleMapping Type="User" Text="Alex" ApplyCssClass="rsCategoryBlue" />
+        <telerik:ResourceStyleMapping Type="User" Text="Bob" ApplyCssClass="rsCategoryOrange" />
+        <telerik:ResourceStyleMapping Type="User" Text="Charlie" ApplyCssClass="rsCategoryGreen" />
+    </ResourceStyles>
 </telerik:RadScheduler>
    
 <telerik:RadScriptManager runat="server" ID="RadScriptManager1"></telerik:RadScriptManager>

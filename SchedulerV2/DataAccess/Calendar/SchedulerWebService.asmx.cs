@@ -56,6 +56,7 @@
 		[WebMethod(EnableSession = true)]
 		public IEnumerable<AppointmentData> UpdateAppointment(SchedulerInfo schedulerInfo, AppointmentData appointmentData)
 		{
+		    return Controller.InsertAppointment(schedulerInfo, appointmentData);
 			return Controller.UpdateAppointment(schedulerInfo, appointmentData);
 		}
 

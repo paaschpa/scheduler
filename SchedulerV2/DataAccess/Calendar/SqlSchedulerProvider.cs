@@ -43,7 +43,6 @@ namespace SchedulerV2.DataAccess.Calendar
             }
         }
 
-
         public override IEnumerable<Appointment> GetAppointments(RadScheduler owner)
         {
             List<Appointment> appointments = new List<Appointment>();
@@ -106,9 +105,9 @@ namespace SchedulerV2.DataAccess.Calendar
 
                     cmd.CommandText =
                         @"	INSERT	INTO [Appointments]
-        									([Subject], [Start], [End],
+        									([ScheduleID], [Subject], [Start], [End],
         									[RecurrenceRule], [RecurrenceParentID])
-        							VALUES	(@Subject, @Start, @End, @RecurrenceRule, @RecurrenceParentID)";
+        							VALUES	(@ScheduleID, @Subject, @Start, @End, @RecurrenceRule, @RecurrenceParentID)";
 
                     if (DbFactory is SqlClientFactory)
                     {
@@ -126,10 +125,8 @@ namespace SchedulerV2.DataAccess.Calendar
 
                     tran.Commit();
                 }
-            }
+            }        
         }
-
-
 
         private IEnumerable<Resource> LoadManagers()
         {
@@ -161,6 +158,7 @@ namespace SchedulerV2.DataAccess.Calendar
 
         private void PopulateAppointmentParameters(DbCommand cmd, Appointment apt)
         {
+            cmd.Parameters.Add(CreateParameter("@ScheduleID", apt.Attributes["ScheduleID"]));
             cmd.Parameters.Add(CreateParameter("@Subject", apt.Subject));
             cmd.Parameters.Add(CreateParameter("@Start", apt.Start));
             cmd.Parameters.Add(CreateParameter("@End", apt.End));
