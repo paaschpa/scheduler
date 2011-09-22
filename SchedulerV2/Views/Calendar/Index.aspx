@@ -35,15 +35,20 @@
 
     <script type="text/javascript">
     function gridRowDropping(sender, args) {
-        var start = new Date("2011/09/21 12:00");
-        var end = new Date("2011/09/21 16:00");
+        var scheduler = $find('<%= RadScheduler1.ClientID %>');
+
+        var scheduler_date = parseDateToYearMonthDate(scheduler.get_selectedDate());
+        var grid_startTime = args.get_draggedItems()[0].get_element().cells[1].innerHTML;
+        var grid_endTime = args.get_draggedItems()[0].get_element().cells[2].innerHTML;
+
+        var start = new Date(scheduler_date + " " + grid_startTime);
+        var end = new Date(scheduler_date + " " + grid_endTime);
 
         var newAppointment = new Telerik.Web.UI.SchedulerAppointment();
         newAppointment.set_start(start);
         newAppointment.set_end(end);
         newAppointment.set_subject("Test");
 
-        var scheduler = $find('<%= RadScheduler1.ClientID %>');
         scheduler.insertAppointment(newAppointment);
         scheduler.editAppointment(newAppointment);
     }
@@ -51,7 +56,12 @@
     function cancelEvent(sender, eventArgs)
     {
         eventArgs.set_cancel(true);
-    } 
+    }
+
+    function parseDateToYearMonthDate(full_date) {
+        var mnth = full_date.getMonth() + 1; //months are 0 based
+        return full_date.getFullYear() + "/" + mnth + "/" + full_date.getDate();
+    }
                 
             
 //            args.set_cancel(true);
