@@ -87,7 +87,21 @@ namespace SchedulerV2.DataAccess.Calendar
 
         public override IDictionary<ResourceType, IEnumerable<Resource>> GetResources(ISchedulerInfo schedulerInfo)
         {
-            return new Dictionary<ResourceType, IEnumerable<Resource>>();
+            var dict = new Dictionary<ResourceType, IEnumerable<Resource>>()
+                           {
+                               {new ResourceType("Type"), new[] {
+                                                                    new Resource("Type", 1, "Standard"), 
+                                                                    new Resource("Type", 2, "Vacation"),
+                                                                    new Resource("Type", 3, "Borrowed")
+                                                                } 
+                               },                                
+                               {new ResourceType("User"), new[]
+                                                              {
+                                                                  new Resource("User", 1, "TestUser")
+                                                              } 
+                               }
+                           };
+            return dict;
         } 
 
         public override void Insert(RadScheduler owner, Appointment appointmentToInsert)
@@ -105,9 +119,9 @@ namespace SchedulerV2.DataAccess.Calendar
 
                     cmd.CommandText =
                         @"	INSERT	INTO [Appointments]
-        									([ScheduleID], [Subject], [Start], [End],
+        									([ScheduleID], [TypeID], [Subject], [Start], [End],
         									[RecurrenceRule], [RecurrenceParentID])
-        							VALUES	(@ScheduleID, @Subject, @Start, @End, @RecurrenceRule, @RecurrenceParentID)";
+        							VALUES	(@ScheduleID, @TypeID, @Subject, @Start, @End, @RecurrenceRule, @RecurrenceParentID)";
 
                     if (DbFactory is SqlClientFactory)
                     {
@@ -159,6 +173,7 @@ namespace SchedulerV2.DataAccess.Calendar
         private void PopulateAppointmentParameters(DbCommand cmd, Appointment apt)
         {
             cmd.Parameters.Add(CreateParameter("@ScheduleID", apt.Attributes["ScheduleID"]));
+            cmd.Parameters.Add(CreateParameter("@TypeID", apt.Resources[0].Key));
             cmd.Parameters.Add(CreateParameter("@Subject", apt.Subject));
             cmd.Parameters.Add(CreateParameter("@Start", apt.Start));
             cmd.Parameters.Add(CreateParameter("@End", apt.End));

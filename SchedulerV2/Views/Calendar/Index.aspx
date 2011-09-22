@@ -13,6 +13,51 @@
 </script>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+<script type="text/javascript">
+function gridRowDropping(sender, args) {
+    var scheduler = $find('<%= RadScheduler1.ClientID %>');
+
+    var scheduler_date = parseDateToYearMonthDate(scheduler.get_selectedDate());
+    var grid_startTime = args.get_draggedItems()[0].get_element().cells[1].innerHTML;
+    var grid_endTime = args.get_draggedItems()[0].get_element().cells[2].innerHTML;
+
+    var start = new Date(scheduler_date + " " + grid_startTime);
+    var end = new Date(scheduler_date + " " + grid_endTime);
+
+    var newAppointment = new Telerik.Web.UI.SchedulerAppointment();
+    newAppointment.get_attributes().setAttribute('ScheduleID', <%= Model.ScheduleID %>)
+    newAppointment.set_start(start);
+    newAppointment.set_end(end);
+    newAppointment.set_subject("Test");
+
+    scheduler.insertAppointment(newAppointment);
+    scheduler.editAppointment(newAppointment);
+}
+
+function onClientFormCreated(sender, eventArgs) {
+    var mode = eventArgs.get_mode();
+	if (mode == Telerik.Web.UI.SchedulerFormMode.AdvancedInsert || mode == Telerik.Web.UI.SchedulerFormMode.AdvancedEdit) {
+		var inputCurrentValue = $telerik.$("[id*='Form_ResType_Input']").attr("Value");
+		if (inputCurrentValue == "-" || inputCurrentValue == "None") {
+			$telerik.$("[id*='Form_ResType_Input']").attr("Value", "Please select a type");
+			$telerik.$("[id*='Form_ResType_DropDown'] li:eq(0)").html("None");
+		} else {
+			$telerik.$("[id*='Form_ResType_DropDown'] li:eq(0)").html("None");
+		}
+	}
+}
+
+function cancelEvent(sender, eventArgs)
+{
+    eventArgs.set_cancel(true);
+}
+
+function parseDateToYearMonthDate(full_date) {
+    var mnth = full_date.getMonth() + 1; //months are 0 based
+    return full_date.getFullYear() + "/" + mnth + "/" + full_date.getDate();
+}                         
+</script>
+
 
     <%
         RadGrid1.DataSource = Model.Location.Shifts;
@@ -33,59 +78,22 @@
         </ClientSettings>
     </telerik:RadGrid>
 
-    <script type="text/javascript">
-    function gridRowDropping(sender, args) {
-        var scheduler = $find('<%= RadScheduler1.ClientID %>');
-
-        var scheduler_date = parseDateToYearMonthDate(scheduler.get_selectedDate());
-        var grid_startTime = args.get_draggedItems()[0].get_element().cells[1].innerHTML;
-        var grid_endTime = args.get_draggedItems()[0].get_element().cells[2].innerHTML;
-
-        var start = new Date(scheduler_date + " " + grid_startTime);
-        var end = new Date(scheduler_date + " " + grid_endTime);
-
-        var newAppointment = new Telerik.Web.UI.SchedulerAppointment();
-        newAppointment.get_attributes().setAttribute('ScheduleID', <%= Model.ScheduleID %>)
-        newAppointment.set_start(start);
-        newAppointment.set_end(end);
-        newAppointment.set_subject("Test");
-
-        scheduler.insertAppointment(newAppointment);
-        scheduler.editAppointment(newAppointment);
-    }
-
-    function saveOrUpdateAppointment(sender, eventArgs) {
-        alert('hi');
-    }
-
-    function cancelEvent(sender, eventArgs)
-    {
-        eventArgs.set_cancel(true);
-    }
-
-    function parseDateToYearMonthDate(full_date) {
-        var mnth = full_date.getMonth() + 1; //months are 0 based
-        return full_date.getFullYear() + "/" + mnth + "/" + full_date.getDate();
-    }                         
-    </script>
-
 <%=Html.ActionLink("create new", "Create", "Shift", new { locationId = Model.Location.LocationID }, null)%>
 <p>&nbsp;</p>
 
+
 <telerik:RadScheduler runat="server" ID="RadScheduler1" Height="400px" 
-    OnClientAppointmentWebServiceInserting="cancelEvent"
+    OnClientAppointmentWebServiceInserting="cancelEvent" 
+    OnClientFormCreated="onClientFormCreated"
     StartInsertingInAdvancedForm="true"
     CustomAttributeNames="ScheduleID">
-	<WebServiceSettings Path="~/DataAccess/Calendar/SchedulerWebService.asmx" />
+	<WebServiceSettings Path="~/DataAccess/Calendar/SchedulerWebService.asmx" ResourcePopulationMode="ServerSide" />
     <ResourceTypes>
-    <telerik:ResourceType KeyField="ID" Name="User" TextField="UserName" ForeignKeyField="UserID"
+    <telerik:ResourceType KeyField="ID" Name="Employee" TextField="Employee" ForeignKeyField="UserID"
         DataSourceID="UsersDataSource" />
+    <telerik:ResourceType KeyField="ID" Name="Type" TextField="Type" ForeignKeyField="TypeID" />
     </ResourceTypes>
-    <ResourceStyles>
-        <telerik:ResourceStyleMapping Type="User" Text="Alex" ApplyCssClass="rsCategoryBlue" />
-        <telerik:ResourceStyleMapping Type="User" Text="Bob" ApplyCssClass="rsCategoryOrange" />
-        <telerik:ResourceStyleMapping Type="User" Text="Charlie" ApplyCssClass="rsCategoryGreen" />
-    </ResourceStyles>
+
 </telerik:RadScheduler>
    
 <telerik:RadScriptManager runat="server" ID="RadScriptManager1"></telerik:RadScriptManager>
