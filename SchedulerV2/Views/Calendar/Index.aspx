@@ -19,7 +19,7 @@
         RadGrid1.DataBind();        
     %>
 
-    <telerik:RadGrid ID="RadGrid1" runat="server" AutoGenerateColumns="false" AllowMultiRowSelection="true">
+    <telerik:RadGrid ID="RadGrid1" runat="server" AutoGenerateColumns="false" AllowMultiRowSelection="true" >
         <MasterTableView>
             <Columns>
                 <telerik:GridBoundColumn DataField="Name" HeaderText="Shfit Name" UniqueName="Name" />
@@ -34,15 +34,24 @@
     </telerik:RadGrid>
 
     <script type="text/javascript">
-        function onClientTimeSlotClick(sender, eventArgs) {
-            var targetSlot = eventArgs.get_targetSlot();
+    function gridRowDropping(sender, args) {
+        var start = new Date("2011/09/21 12:00");
+        var end = new Date("2011/09/21 16:00");
 
-            sender.showInsertFormAt(targetSlot);
-        }
+        var newAppointment = new Telerik.Web.UI.SchedulerAppointment();
+        newAppointment.set_start(start);
+        newAppointment.set_end(end);
+        newAppointment.set_subject("Test");
 
-        function gridRowDropping(sender, args) {
-            scheduler = $find('<%= RadScheduler1.ClientID %>');
-            scheduler.showInsertFormAt(new Telerik.Web.UI.Scheduler.WeekTimeSlot());
+        var scheduler = $find('<%= RadScheduler1.ClientID %>');
+        scheduler.insertAppointment(newAppointment);
+        scheduler.editAppointment(newAppointment);
+    }
+
+    function cancelEvent(sender, eventArgs)
+    {
+        eventArgs.set_cancel(true);
+    } 
                 
             
 //            args.set_cancel(true);
@@ -53,13 +62,13 @@
 //                dropPosition: args.get_dropPosition(),
 //                targetHtmlElement: args.get_destinationHtmlElement().tagName
 //            });
-        }
     </script>
 
 <%=Html.ActionLink("create new", "Create", "Shift", new { locationId = Model.Location.LocationID }, null)%>
 <p>&nbsp;</p>
 
-<telerik:RadScheduler runat="server" ID="RadScheduler1" Height="400px" OnClientTimeSlotClick="onClientTimeSlotClick" >
+<telerik:RadScheduler runat="server" ID="RadScheduler1" Height="400px" OnClientAppointmentWebServiceInserting="cancelEvent"
+    OnClientAppointmentsPopulating="cancelEvent" OnClientResourcesPopulating="cancelEvent" StartInsertingInAdvancedForm="true" >
 	<WebServiceSettings Path="~/DataAccess/Calendar/SchedulerWebService.asmx" />
     <AdvancedEditTemplate>     
         <asp:TextBox ID="TitleTextBox" Rows="5" Columns="20" runat="server" Text='<%# Bind("Subject") %>' Width="97%" TextMode="MultiLine">
