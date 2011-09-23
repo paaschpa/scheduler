@@ -14,6 +14,8 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 <script type="text/javascript">
+
+var shouldCancelInsert = false;
 function gridRowDropping(sender, args) {
     var scheduler = $find('<%= RadScheduler1.ClientID %>');
     var htmlElement = args.get_destinationHtmlElement();
@@ -32,7 +34,9 @@ function gridRowDropping(sender, args) {
     newAppointment.set_end(end);
     newAppointment.set_subject("Test");
 
+    shouldCancelInsert = true;
     scheduler.insertAppointment(newAppointment);
+    shouldCancelInsert = false;
     scheduler.editAppointment(newAppointment);
 }
 
@@ -51,7 +55,7 @@ function gridRowDropping(sender, args) {
 
 function cancelEvent(sender, eventArgs)
 {
-    eventArgs.set_cancel(true);
+    eventArgs.set_cancel(shouldCancelInsert);
 }
 
 function parseDateToYearMonthDate(full_date) {
@@ -84,15 +88,14 @@ function parseDateToYearMonthDate(full_date) {
 <p>&nbsp;</p>
 
 
-<telerik:RadScheduler runat="server" ID="RadScheduler1" Height="400px" OnClientWebSer
-    OnClientAppointmentWebServiceInserting="cancelEvent"        
+<telerik:RadScheduler runat="server" ID="RadScheduler1" Height="400px"
+    OnClientAppointmentWebServiceInserting="cancelEvent"
     StartInsertingInAdvancedForm="true"
     CustomAttributeNames="ScheduleID">
 	<WebServiceSettings Path="~/DataAccess/Calendar/SchedulerWebService.asmx" ResourcePopulationMode="ServerSide" />
     <ResourceTypes>
-    <telerik:ResourceType KeyField="ID" Name="Employee" TextField="Employee" ForeignKeyField="UserID"
-        DataSourceID="UsersDataSource" />
-    <telerik:ResourceType KeyField="ID" Name="Type" TextField="Type" ForeignKeyField="TypeID" />
+        <telerik:ResourceType KeyField="ID" Name="Employee" TextField="Employee" ForeignKeyField="UserID" />
+        <telerik:ResourceType KeyField="ID" Name="Type" TextField="Type" ForeignKeyField="TypeID" />
     </ResourceTypes>
 
 </telerik:RadScheduler>
