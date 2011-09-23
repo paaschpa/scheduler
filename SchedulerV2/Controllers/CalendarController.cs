@@ -12,8 +12,8 @@ namespace SchedulerV2.Controllers
         //
         // GET: /Calendar/
         public ActionResult Index(int? scheduleId)
-        {
-            var schedule = Schedule.FindById(scheduleId.Value);
+        {            
+            var schedule = Schedule.FindById(scheduleId.Value);            
             return View(schedule);
         }
     }

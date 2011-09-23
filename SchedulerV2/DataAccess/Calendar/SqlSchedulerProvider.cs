@@ -12,6 +12,12 @@ namespace SchedulerV2.DataAccess.Calendar
 {
     public class SqlSchedulerProvider : DbSchedulerProviderBase
     {
+        private IEnumerable<Resource> _types = new[] {
+                                                        new Resource("Type", 1, "Standard"), 
+                                                        new Resource("Type", 2, "Vacation"),
+                                                        new Resource("Type", 3, "Borrowed")
+                                                     }; 
+
         private DbProviderFactory _dbFactory = SqlClientFactory.Instance;
         public override DbProviderFactory DbFactory
         {
@@ -24,24 +30,6 @@ namespace SchedulerV2.DataAccess.Calendar
                 _dbFactory = value;
             }
         }
-        private IDictionary<int, Resource> _managers;
-
-        private IDictionary<int, Resource> Managers
-        {
-            get
-            {
-                if (_managers == null)
-                {
-                    _managers = new Dictionary<int, Resource>();
-                    foreach (Resource manager in LoadManagers())
-                    {
-                        _managers.Add((int)manager.Key, manager);
-                    }
-                }
-
-                return _managers;
-            }
-        }
 
         public override IEnumerable<Appointment> GetAppointments(RadScheduler owner)
         {
@@ -51,7 +39,9 @@ namespace SchedulerV2.DataAccess.Calendar
             {
                 DbCommand cmd = new SqlCommand();
                 cmd.Connection = conn;
-                cmd.CommandText = "SELECT [ID], [Subject], [Start], [End], [RecurrenceRule], [RecurrenceParentId] FROM [Appointments]";
+                cmd.CommandText = @"SELECT [ID], [ScheduleID], [TypeID], [Subject], [Start], [End], 
+                                    [RecurrenceRule], [RecurrenceParentId] FROM [Appointments]";
+                
                 conn.Open();
                 using (DbDataReader reader = cmd.ExecuteReader())
                 {
@@ -70,13 +60,16 @@ namespace SchedulerV2.DataAccess.Calendar
                         {
                             apt.RecurrenceState = RecurrenceState.Exception;
                         }
-                        else
-                            if (apt.RecurrenceRule != string.Empty)
-                            {
-                                apt.RecurrenceState = RecurrenceState.Master;
-                            }
+                        else if (apt.RecurrenceRule != string.Empty)
+                        {
+                            apt.RecurrenceState = RecurrenceState.Master;
+                        }
 
-                        //LoadResources(apt);
+                        var typeID = reader["TypeID"].ToString();
+                        apt.Resources.Add(_types.Where(x => x.Key.ToString() == typeID).SingleOrDefault());
+
+                        apt.Attributes.Add("ScheduleID", reader["ScheduleID"].ToString());
+
                         appointments.Add(apt);
                     }
                 }
@@ -89,12 +82,7 @@ namespace SchedulerV2.DataAccess.Calendar
         {
             var dict = new Dictionary<ResourceType, IEnumerable<Resource>>()
                            {
-                               {new ResourceType("Type"), new[] {
-                                                                    new Resource("Type", 1, "Standard"), 
-                                                                    new Resource("Type", 2, "Vacation"),
-                                                                    new Resource("Type", 3, "Borrowed")
-                                                                } 
-                               },                                
+                               {new ResourceType("Type"), _types},                                
                                {new ResourceType("User"), new[]
                                                               {
                                                                   new Resource("User", 1, "TestUser")
@@ -118,7 +106,7 @@ namespace SchedulerV2.DataAccess.Calendar
                     PopulateAppointmentParameters(cmd, appointmentToInsert);
 
                     cmd.CommandText =
-                        @"	INSERT	INTO [Appointments]
+                        @"INSERT INTO [Appointments]
         									([ScheduleID], [TypeID], [Subject], [Start], [End],
         									[RecurrenceRule], [RecurrenceParentID])
         							VALUES	(@ScheduleID, @TypeID, @Subject, @Start, @End, @RecurrenceRule, @RecurrenceParentID)";
@@ -133,13 +121,59 @@ namespace SchedulerV2.DataAccess.Calendar
 
                         cmd.CommandText = "SELECT @@IDENTITY";
                     }
-                    int identity = Convert.ToInt32(cmd.ExecuteScalar());
-
-                    //FillClassStudents(appointmentToInsert, cmd, identity);
+                    int identity = Convert.ToInt32(cmd.ExecuteScalar());                    
 
                     tran.Commit();
                 }
             }        
+        }
+
+        public override void Update(RadScheduler owner, Appointment appointmentToUpdate)
+        {
+            using (DbConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CalendarConnectionString"].ToString()))
+            {
+                conn.Open();
+                using (DbTransaction tran = conn.BeginTransaction())
+                {
+                    DbCommand cmd = new SqlCommand();
+                    cmd.Connection = conn;
+                    cmd.Transaction = tran;
+
+                    PopulateAppointmentParameters(cmd, appointmentToUpdate);
+
+                    cmd.CommandText =
+                        @"UPDATE [Appointments]
+        									set [ScheduleID]=@ScheduleID, [TypeID]=@TypeID, 
+                                            [Subject]=@Subject, [Start]=@Start, 
+                                            [End]=@End, [RecurrenceRule]=@RecurrenceRule, 
+                                            [RecurrenceParentID] = @RecurrenceParentID
+        				 WHERE ID=@ID";
+                    
+                    cmd.ExecuteNonQuery();                    
+                    tran.Commit();
+                }
+            }
+        }
+
+        public override void Delete(RadScheduler owner, Appointment appointmentToDelete)
+        {
+            using (DbConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CalendarConnectionString"].ToString()))
+            {
+                conn.Open();
+                using (DbTransaction tran = conn.BeginTransaction())
+                {
+                    DbCommand cmd = new SqlCommand();
+                    cmd.Connection = conn;
+                    cmd.Transaction = tran;                    
+
+                    cmd.CommandText = @"DELETE [Appointments] WHERE ID=@ID";
+
+                    cmd.Parameters.Add(CreateParameter("@ID", appointmentToDelete.ID));
+
+                    cmd.ExecuteNonQuery();
+                    tran.Commit();
+                }
+            }
         }
 
         private IEnumerable<Resource> LoadManagers()
@@ -178,14 +212,12 @@ namespace SchedulerV2.DataAccess.Calendar
             cmd.Parameters.Add(CreateParameter("@Start", apt.Start));
             cmd.Parameters.Add(CreateParameter("@End", apt.End));
 
-            //Resource teacher = apt.Resources.GetResourceByType("Teacher");
-            //object teacherId = null;
-            //if (teacher != null)
-            //{
-            //    teacherId = teacher.Key;
-            //}
-            //cmd.Parameters.Add(CreateParameter("@TeacherID", teacherId));
-
+            object ID;
+            if (apt.ID != null || apt.ID != string.Empty)
+            {
+                cmd.Parameters.Add(CreateParameter("@ID", apt.ID));
+            }
+            
             string rrule = null;
             if (apt.RecurrenceRule != string.Empty)
             {

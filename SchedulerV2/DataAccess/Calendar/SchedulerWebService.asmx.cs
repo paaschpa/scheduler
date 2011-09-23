@@ -23,7 +23,7 @@
 			{
 				DbSchedulerProviderBase provider;
 				if ((Session[ProviderSessionKey] == null))
-				{
+				{                                        
 					provider = new SqlSchedulerProvider();
 					Session[ProviderSessionKey] = provider;
 				}
@@ -50,15 +50,17 @@
 		[WebMethod(EnableSession = true)]
 		public IEnumerable<AppointmentData> InsertAppointment(SchedulerInfo schedulerInfo, AppointmentData appointmentData)
 		{
-			return Controller.InsertAppointment(schedulerInfo, appointmentData);
+			return Controller.InsertAppointment(schedulerInfo, appointmentData); 
 		}
 
 		[WebMethod(EnableSession = true)]
 		public IEnumerable<AppointmentData> UpdateAppointment(SchedulerInfo schedulerInfo, AppointmentData appointmentData)
 		{
-		    return Controller.InsertAppointment(schedulerInfo, appointmentData);
-			return Controller.UpdateAppointment(schedulerInfo, appointmentData);
-		}
+            if (appointmentData.ID == null)
+                return Controller.InsertAppointment(schedulerInfo, appointmentData); //Inserts Or Updates the Appointment
+
+            return Controller.UpdateAppointment(schedulerInfo, appointmentData);
+        }
 
 		[WebMethod(EnableSession = true)]
 		public IEnumerable<AppointmentData> CreateRecurrenceException(SchedulerInfo schedulerInfo, AppointmentData recurrenceExceptionData)
@@ -75,6 +77,8 @@
 		[WebMethod(EnableSession = true)]
 		public IEnumerable<AppointmentData> DeleteAppointment(SchedulerInfo schedulerInfo, AppointmentData appointmentData, bool deleteSeries)
 		{
+            if (appointmentData.ID == null)
+                return null;
 			return Controller.DeleteAppointment(schedulerInfo, appointmentData, deleteSeries);
 		}
 

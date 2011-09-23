@@ -64,7 +64,7 @@
 
 <script type="text/javascript">
     function treeView_OnSelect(e) {
-        if (e.item.childElementCount == 1) {
+        if (e.item.childElementCount == 1 || e.item.childNodes.length == 1) {
             //alert(this.getItemValue(e.item));
             var locationId = this.getItemValue(e.item);
             $("#selected_location").html(this.getItemText(e.item));
