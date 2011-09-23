@@ -23,8 +23,8 @@
 			{
 				DbSchedulerProviderBase provider;
 				if ((Session[ProviderSessionKey] == null))
-				{                                        
-					provider = new SqlSchedulerProvider();
+				{        
+					provider = new SqlSchedulerProvider(Session);
 					Session[ProviderSessionKey] = provider;
 				}
 				else

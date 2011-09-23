@@ -12,7 +12,10 @@ namespace SchedulerV2.Controllers
         //
         // GET: /Calendar/
         public ActionResult Index(int? scheduleId)
-        {            
+        {
+            //This gets passed to the Webservice's DataProvider to filter appointments by ScheduleID
+            //Slightly obscure way and not good if Session gets packed with data.
+            Session["ScheduleID"] = scheduleId.Value; 
             var schedule = Schedule.FindById(scheduleId.Value);            
             return View(schedule);
         }

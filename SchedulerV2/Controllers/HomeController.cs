@@ -13,7 +13,7 @@ namespace SchedulerV2.Controllers
     {
         [Authorize]
         public ActionResult Index()
-        {            
+        {
             return View(Employee.ListAllDOs());
         }
 

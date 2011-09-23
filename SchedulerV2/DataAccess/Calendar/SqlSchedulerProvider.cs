@@ -31,6 +31,13 @@ namespace SchedulerV2.DataAccess.Calendar
             }
         }
 
+        private System.Web.SessionState.HttpSessionState _session;
+
+        public SqlSchedulerProvider(System.Web.SessionState.HttpSessionState session)
+        {
+            _session = session;
+        }
+
         public override IEnumerable<Appointment> GetAppointments(RadScheduler owner)
         {
             List<Appointment> appointments = new List<Appointment>();
@@ -40,7 +47,8 @@ namespace SchedulerV2.DataAccess.Calendar
                 DbCommand cmd = new SqlCommand();
                 cmd.Connection = conn;
                 cmd.CommandText = @"SELECT [ID], [ScheduleID], [TypeID], [Subject], [Start], [End], 
-                                    [RecurrenceRule], [RecurrenceParentId] FROM [Appointments]";
+                                    [RecurrenceRule], [RecurrenceParentId] FROM [Appointments] WHERE [ScheduleID]=@ScheduleID";
+                cmd.Parameters.Add(CreateParameter("@ScheduleID", _session["ScheduleID"]));
                 
                 conn.Open();
                 using (DbDataReader reader = cmd.ExecuteReader())
@@ -174,34 +182,6 @@ namespace SchedulerV2.DataAccess.Calendar
                     tran.Commit();
                 }
             }
-        }
-
-        private IEnumerable<Resource> LoadManagers()
-        {
-            List<Resource> resources = new List<Resource>();
-
-            using (DbConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CalendarConnectionString"].ToString()))
-            {
-                DbCommand cmd = DbFactory.CreateCommand();
-                cmd.Connection = conn;
-                cmd.CommandText = "SELECT [UserID], [UserName], [Phone] FROM [Users]";
-
-                conn.Open();
-                using (DbDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        Resource res = new Resource();
-                        res.Type = "Manager";
-                        res.Key = reader["UserID"];
-                        res.Text = Convert.ToString(reader["UserName"]);
-                        //res.Attributes["Phone"] = Convert.ToString(reader["Phone"]);
-                        resources.Add(res);
-                    }
-                }
-            }
-
-            return resources;
         }
 
         private void PopulateAppointmentParameters(DbCommand cmd, Appointment apt)

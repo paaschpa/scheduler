@@ -63,7 +63,7 @@ function parseDateToYearMonthDate(full_date) {
 
     <%
         RadGrid1.DataSource = Model.Location.Shifts;
-        RadGrid1.DataBind();        
+        RadGrid1.DataBind();
     %>
 
     <telerik:RadGrid ID="RadGrid1" runat="server" AutoGenerateColumns="false" AllowMultiRowSelection="true" >
@@ -84,7 +84,7 @@ function parseDateToYearMonthDate(full_date) {
 <p>&nbsp;</p>
 
 
-<telerik:RadScheduler runat="server" ID="RadScheduler1" Height="400px" 
+<telerik:RadScheduler runat="server" ID="RadScheduler1" Height="400px" OnClientWebSer
     OnClientAppointmentWebServiceInserting="cancelEvent"        
     StartInsertingInAdvancedForm="true"
     CustomAttributeNames="ScheduleID">
